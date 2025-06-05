@@ -1,0 +1,5 @@
+Puppy is an object.
+It has the following properties:
+- an integer to store weight
+- a string to store name
+It has an initialization function called eat which takes two parameters, weight and eat.
