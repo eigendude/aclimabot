@@ -1,7 +1,7 @@
 import argparse
 import os
 from pathlib import Path
-from typing import Optional
+from typing import Iterable, Optional
 
 import openai
 
@@ -31,9 +31,10 @@ def call_openai(prompt: str, model: str = "gpt-4o") -> str:
     return response.choices[0].message.content
 
 
-def generate_react_app(prompt_file: Path, output: Optional[Path] = None) -> None:
-    """Generate a React app from a natural language prompt."""
-    prompt = prompt_file.read_text()
+def generate_react_app(prompt_files: Iterable[Path], output: Optional[Path] = None) -> None:
+    """Generate a React app from one or more natural language prompts."""
+    prompt_parts = [p.read_text() for p in prompt_files]
+    prompt = "\n\n".join(prompt_parts)
     generated = call_openai(prompt)
 
     if output is None:
@@ -45,7 +46,12 @@ def generate_react_app(prompt_file: Path, output: Optional[Path] = None) -> None
 
 def main(argv: Optional[list[str]] = None) -> None:
     parser = argparse.ArgumentParser(description="Generate React code from prompts.")
-    parser.add_argument("prompt", type=Path, help="Path to the text prompt file")
+    parser.add_argument(
+        "prompt",
+        type=Path,
+        nargs="+",
+        help="Path(s) to one or more text prompt files",
+    )
     parser.add_argument("-o", "--output", type=Path, help="Output directory")
     parser.add_argument("--model", default="gpt-4o", help="OpenAI model name")
     args = parser.parse_args(argv)
